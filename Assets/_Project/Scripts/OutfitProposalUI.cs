@@ -125,33 +125,38 @@ namespace Mode3D.Destinations
 			// Bouton retour
 			CreateBackButton(panel);
 
-			float yPos = 150f;
+			float yPos = 210f; // Ajusté pour grand panel
 
-			// Progression
-			CreateText(panel, $"Tenue {currentOutfitIndex + 1} / {allOutfits.Count}", 
-				new Vector2(0, yPos), new Vector2(400, 30), 16, FontStyle.Bold, new Color(0.8f, 1f, 0.8f, 1f));
-			yPos -= 45f;
+			// Progression GRANDE
+			UIHelper.CreateText(panel, $"Tenue {currentOutfitIndex + 1} / {allOutfits.Count}", 
+				new Vector2(650, 35), new Vector2(0, yPos), 
+				18, FontStyle.Bold, new Color(0.8f, 1f, 0.8f, 1f));
+			yPos -= 55f;
 
 			// Jour et date
-			CreateText(panel, $"📅 Jour {current.dayNumber} - {current.date:dd MMMM}", 
-				new Vector2(0, yPos), new Vector2(400, 30), 16, FontStyle.Normal, Color.white);
-			yPos -= 35f;
+			UIHelper.CreateText(panel, $"📅 Jour {current.dayNumber} - {current.date:dd MMMM}", 
+				new Vector2(650, 35), new Vector2(0, yPos), 
+				18, FontStyle.Normal, new Color(0.9f, 0.9f, 0.9f, 1f));
+			yPos -= 45f;
 
 			// Météo
-			CreateText(panel, $"{current.weather} | {current.temperature:F0}°C", 
-				new Vector2(0, yPos), new Vector2(400, 25), 14, FontStyle.Normal, Color.white);
-			yPos -= 50f;
+			UIHelper.CreateText(panel, $"{current.weather} | {current.temperature:F0}°C", 
+				new Vector2(650, 30), new Vector2(0, yPos), 
+				16, FontStyle.Normal, new Color(0.8f, 0.8f, 0.8f, 1f));
+			yPos -= 60f;
 
-			// Catégorie de tenue
-			CreateText(panel, $"{GetCategoryIcon(current.category)} Catégorie: {current.category}", 
-				new Vector2(0, yPos), new Vector2(400, 35), 18, FontStyle.Bold, Color.white);
-			yPos -= 55f;
+			// Catégorie de tenue GRANDE
+			UIHelper.CreateText(panel, $"{GetCategoryIcon(current.category)} Catégorie: {current.category}", 
+				new Vector2(650, 40), new Vector2(0, yPos), 
+				20, FontStyle.Bold, Color.white);
+			yPos -= 65f;
 
 			// Matière actuelle
 			string currentMaterial = availableMaterials[currentMaterialIndex];
-			CreateText(panel, $"Matière: {currentMaterial}", 
-				new Vector2(0, yPos), new Vector2(400, 30), 16, FontStyle.Normal, new Color(1f, 0.9f, 0.6f, 1f));
-			yPos -= 50f;
+			UIHelper.CreateText(panel, $"🎨 Matière: {currentMaterial}", 
+				new Vector2(650, 35), new Vector2(0, yPos), 
+				18, FontStyle.Normal, new Color(1f, 0.9f, 0.6f, 1f));
+			yPos -= 60f;
 
 			// Boutons changement de matière
 			CreateButton(panel, "◄ Matière Précédente", 
@@ -187,40 +192,26 @@ namespace Mode3D.Destinations
 
 		private GameObject CreatePanel()
 		{
-			GameObject panel = new GameObject("Panel");
-			panel.transform.SetParent(canvas.transform, false);
-			
-			Image panelBg = panel.AddComponent<Image>();
-			panelBg.color = panelColor;
-			
-			RectTransform panelRt = panel.GetComponent<RectTransform>();
-			panelRt.anchorMin = new Vector2(0.5f, 0.5f);
-			panelRt.anchorMax = new Vector2(0.5f, 0.5f);
-			panelRt.sizeDelta = new Vector2(450, 420);
-			panelRt.anchoredPosition = Vector2.zero;
+			// Panel arrondi moderne GRAND et AÉRÉ
+			GameObject panel = UIHelper.CreateRoundedPanel(
+				canvas.gameObject,
+				new Vector2(700, 600), // Plus grand et aéré
+				Vector2.zero,
+				new Color(0.03f, 0.03f, 0.03f, 0.95f),
+				25f // Grandes marges
+			);
 
-			// Titre
-			GameObject titleBg = new GameObject("TitleBg");
-			titleBg.transform.SetParent(panel.transform, false);
-			Image titleBgImg = titleBg.AddComponent<Image>();
-			titleBgImg.color = accentColor;
-			RectTransform titleRt = titleBg.GetComponent<RectTransform>();
-			titleRt.anchorMin = new Vector2(0, 1);
-			titleRt.anchorMax = new Vector2(1, 1);
-			titleRt.pivot = new Vector2(0.5f, 1);
-			titleRt.sizeDelta = new Vector2(0, 50);
-			titleRt.anchoredPosition = Vector2.zero;
-
-			CreateText(titleBg, "👗 Présentation des Tenues", 
-				Vector2.zero, new Vector2(450, 50), 18, FontStyle.Bold, Color.white);
+			// Titre GRAND
+			UIHelper.CreateText(panel, "👗 Présentation des Tenues",
+				new Vector2(650, 50), new Vector2(0, 270),
+				26, FontStyle.Bold, new Color(0.2f, 0.8f, 1f, 1f));
 
 			return panel;
 		}
 
 		private void CreateBackButton(GameObject parent)
 		{
-			CreateButton(parent, "← Retour au Récap", 
-				new Vector2(0, 190), new Vector2(150, 35), 
+			UIHelper.CreateBackButton(parent, new Vector2(-290, 280),
 				() => {
 					ClearMannequin();
 					if (ghostDisplay != null) Destroy(ghostDisplay.gameObject);
@@ -295,15 +286,19 @@ namespace Mode3D.Destinations
 			ShowSuitcasePreparation();
 		}
 
+		private SuitcasePreparationUI_Final currentSuitcaseUI; // Garder la référence
+
 		private void ShowSuitcasePreparation()
 		{
-			GameObject suitcaseGO = new GameObject("SuitcasePreparationUI");
-			SuitcasePreparationUI suitcaseUI = suitcaseGO.AddComponent<SuitcasePreparationUI>();
-			suitcaseUI.ShowSuitcase(
+			GameObject suitcaseGO = new GameObject("SuitcasePreparationUI_Final");
+			currentSuitcaseUI = suitcaseGO.AddComponent<SuitcasePreparationUI_Final>();
+			currentSuitcaseUI.ShowSuitcase(
 				outfitList: allOutfits,
 				onPaymentComplete: () => {
+					// Récupérer le circularDisplay avant de détruire
+					CircularOutfitDisplay circDisplay = currentSuitcaseUI.GetCircularDisplay();
 					Destroy(suitcaseGO);
-					ShowThankYou();
+					ShowThankYou(circDisplay);
 				},
 				onBackCallback: () => {
 					Destroy(suitcaseGO);
@@ -312,7 +307,7 @@ namespace Mode3D.Destinations
 			);
 		}
 
-		private void ShowThankYou()
+		private void ShowThankYou(CircularOutfitDisplay circDisplay)
 		{
 			GameObject thankYouGO = new GameObject("ThankYouUI");
 			ThankYouUI thankYouUI = thankYouGO.AddComponent<ThankYouUI>();
@@ -320,7 +315,7 @@ namespace Mode3D.Destinations
 				// Retour à l'accueil (sélection ville)
 				Destroy(thankYouGO);
 				RestartApplication();
-			});
+			}, circDisplay); // Passer le circularDisplay
 		}
 
 		private void RestartApplication()
@@ -404,45 +399,8 @@ namespace Mode3D.Destinations
 
 		private GameObject CreateButton(GameObject parent, string text, Vector2 pos, Vector2 size, Action onClick)
 		{
-			GameObject btnGO = new GameObject($"Button_{text}");
-			btnGO.transform.SetParent(parent.transform, false);
-			
-			Image btnImg = btnGO.AddComponent<Image>();
-			btnImg.color = accentColor;
-			
-			Button btn = btnGO.AddComponent<Button>();
-			btn.onClick.AddListener(() => onClick());
-			
-			var colors = btn.colors;
-			colors.normalColor = accentColor;
-			colors.highlightedColor = new Color(0.2f, 0.7f, 1f, 1f);
-			colors.pressedColor = new Color(0.1f, 0.5f, 0.8f, 1f);
-			btn.colors = colors;
-			
-			RectTransform btnRt = btnGO.GetComponent<RectTransform>();
-			btnRt.anchorMin = new Vector2(0.5f, 0.5f);
-			btnRt.anchorMax = new Vector2(0.5f, 0.5f);
-			btnRt.sizeDelta = size;
-			btnRt.anchoredPosition = pos;
-			
-			// Text
-			GameObject textGO = new GameObject("Text");
-			textGO.transform.SetParent(btnGO.transform, false);
-			Text btnText = textGO.AddComponent<Text>();
-			btnText.text = text;
-			btnText.fontSize = 13;
-			btnText.fontStyle = FontStyle.Bold;
-			btnText.alignment = TextAnchor.MiddleCenter;
-			btnText.color = Color.white;
-			btnText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-			
-			RectTransform textRt = textGO.GetComponent<RectTransform>();
-			textRt.anchorMin = Vector2.zero;
-			textRt.anchorMax = Vector2.one;
-			textRt.offsetMin = Vector2.zero;
-			textRt.offsetMax = Vector2.zero;
-			
-			return btnGO;
+			// Utiliser UIHelper pour boutons arrondis modernes
+			return UIHelper.CreateRoundedButton(parent, text, size, pos, accentColor, onClick);
 		}
 	}
 }

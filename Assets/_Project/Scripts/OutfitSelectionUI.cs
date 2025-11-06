@@ -58,16 +58,14 @@ namespace Mode3D.Destinations
 			canvasGO.AddComponent<GraphicRaycaster>();
 			canvas.sortingOrder = 1000;
 
-			// Panel principal - taille réduite
-			outfitPanel = new GameObject("OutfitPanel");
-			outfitPanel.transform.SetParent(canvasGO.transform, false);
-			Image panelBg = outfitPanel.AddComponent<Image>();
-			panelBg.color = panelColor;
-			RectTransform panelRt = outfitPanel.GetComponent<RectTransform>();
-			panelRt.anchorMin = new Vector2(0.5f, 0.5f);
-			panelRt.anchorMax = new Vector2(0.5f, 0.5f);
-			panelRt.sizeDelta = new Vector2(420, 340); // Plus compact
-			panelRt.anchoredPosition = Vector2.zero;
+			// Panel principal moderne arrondi GRAND et AÉRÉ
+			outfitPanel = UIHelper.CreateRoundedPanel(
+				canvasGO,
+				new Vector2(650, 550), // Plus grand et aéré
+				Vector2.zero,
+				new Color(0.03f, 0.03f, 0.03f, 0.95f),
+				25f // Grandes marges
+			);
 
 			// Bouton retour (flèche)
 			CreateBackButton(outfitPanel);
@@ -88,22 +86,25 @@ namespace Mode3D.Destinations
 			DayOutfit currentDay = OutfitSelection.Instance.dailyOutfits[currentDayIndex];
 			selectedOutfits = new List<OutfitType>(currentDay.outfits);
 
-			float yPos = 150f;
+			float yPos = 235f; // Ajusté pour plus grand panel
 
-			// Titre avec jour
-			CreateText(outfitPanel, $"Jour {currentDayIndex + 1} - {currentDay.date:dd MMMM}", 
-				new Vector2(0, yPos), new Vector2(440, 40), 18, FontStyle.Bold, Color.white);
-			yPos -= 50f;
-
-			// Météo et température
-			CreateText(outfitPanel, $"{currentDay.weather}  |  {currentDay.temperature:F0}°C", 
-				new Vector2(0, yPos), new Vector2(440, 30), 16, FontStyle.Normal, Color.white);
+			// Titre avec jour - GRAND
+			UIHelper.CreateText(outfitPanel, $"Jour {currentDayIndex + 1} - {currentDay.date:dd MMMM}", 
+				new Vector2(620, 45), new Vector2(0, yPos), 
+				22, FontStyle.Bold, new Color(0.2f, 0.8f, 1f, 1f));
 			yPos -= 60f;
 
+			// Météo et température
+			UIHelper.CreateText(outfitPanel, $"{currentDay.weather}  |  {currentDay.temperature:F0}°C", 
+				new Vector2(620, 35), new Vector2(0, yPos), 
+				18, FontStyle.Normal, new Color(0.9f, 0.9f, 0.9f, 1f));
+			yPos -= 70f;
+
 			// Instructions
-			CreateText(outfitPanel, "Choisissez vos tenues :", 
-				new Vector2(0, yPos), new Vector2(440, 25), 14, FontStyle.Normal, Color.white);
-			yPos -= 40f;
+			UIHelper.CreateText(outfitPanel, "Choisissez vos tenues :", 
+				new Vector2(620, 30), new Vector2(0, yPos), 
+				16, FontStyle.Bold, new Color(0.8f, 0.8f, 0.8f, 1f));
+			yPos -= 50f;
 
 			// Boutons des catégories
 			CreateOutfitButtons(outfitPanel, ref yPos);
@@ -279,56 +280,16 @@ namespace Mode3D.Destinations
 
 		private void CreateBackButton(GameObject parent)
 		{
-			CreateButton(parent, "← Retour", 
-				new Vector2(-200, 150), new Vector2(90, 35), 
+			UIHelper.CreateBackButton(parent, new Vector2(-265, 255),
 				() => { 
-					// Mannequin retiré
-					// if (showcaseManager != null) showcaseManager.ClearMannequin();
 					if (onBack != null) { Destroy(canvas.gameObject); onBack(); } 
 				});
 		}
 
 		private GameObject CreateButton(GameObject parent, string text, Vector2 pos, Vector2 size, Action onClick)
 		{
-			GameObject btnGO = new GameObject("Button_" + text);
-			btnGO.transform.SetParent(parent.transform, false);
-			
-			Image btnImg = btnGO.AddComponent<Image>();
-			btnImg.color = accentColor;
-			
-			Button btn = btnGO.AddComponent<Button>();
-			btn.onClick.AddListener(() => onClick());
-			
-			var colors = btn.colors;
-			colors.normalColor = accentColor;
-			colors.highlightedColor = new Color(0.2f, 0.7f, 1f, 1f);
-			colors.pressedColor = new Color(0.1f, 0.5f, 0.8f, 1f);
-			btn.colors = colors;
-			
-			RectTransform btnRt = btnGO.GetComponent<RectTransform>();
-			btnRt.anchorMin = new Vector2(0.5f, 0.5f);
-			btnRt.anchorMax = new Vector2(0.5f, 0.5f);
-			btnRt.sizeDelta = size;
-			btnRt.anchoredPosition = pos;
-			
-			// Text
-			GameObject textGO = new GameObject("Text");
-			textGO.transform.SetParent(btnGO.transform, false);
-			Text btnText = textGO.AddComponent<Text>();
-			btnText.text = text;
-			btnText.font = GetFont();
-			btnText.fontSize = 14;
-			btnText.fontStyle = FontStyle.Bold;
-			btnText.alignment = TextAnchor.MiddleCenter;
-			btnText.color = Color.white;
-			
-			RectTransform textRt = textGO.GetComponent<RectTransform>();
-			textRt.anchorMin = Vector2.zero;
-			textRt.anchorMax = Vector2.one;
-			textRt.offsetMin = Vector2.zero;
-			textRt.offsetMax = Vector2.zero;
-			
-			return btnGO;
+			// Utiliser UIHelper pour boutons arrondis modernes
+			return UIHelper.CreateRoundedButton(parent, text, size, pos, accentColor, onClick);
 		}
 
 		private void CreateText(GameObject parent, string content, Vector2 pos, Vector2 size, int fontSize, FontStyle style, Color color)

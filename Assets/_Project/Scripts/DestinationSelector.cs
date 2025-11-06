@@ -129,43 +129,19 @@ namespace Mode3D.Destinations
 				}
 			}
 
-		// Panel - Taille réduite (plus petit qu'avant)
-			GameObject panelGO = new GameObject("Panel");
-			panelGO.transform.SetParent(canvasGO.transform, false);
-			Image panelImage = panelGO.AddComponent<Image>();
-			panelImage.color = panelColor;
-			RectTransform panelRt = panelGO.GetComponent<RectTransform>();
-			panelRt.anchorMin = new Vector2(0.5f, 0.5f);
-			panelRt.anchorMax = new Vector2(0.5f, 0.5f);
-		panelRt.sizeDelta = new Vector2(350, 200); // Encore plus réduit
-			panelRt.anchoredPosition = Vector2.zero;
+		// Panel GRAND et moderne avec bords arrondis
+			GameObject panelGO = UIHelper.CreateRoundedPanel(
+				canvasGO,
+				new Vector2(600, 400), // GRAND et aéré
+				Vector2.zero,
+				new Color(0.03f, 0.03f, 0.03f, 0.95f),
+				25f
+			);
 
-		// Title with modern styled background
-		GameObject titleBgGO = new GameObject("TitleBackground");
-		titleBgGO.transform.SetParent(panelGO.transform, false);
-		Image titleBg = titleBgGO.AddComponent<Image>();
-		titleBg.color = new Color(0.15f, 0.6f, 0.9f, 1f); // Modern blue gradient
-		RectTransform titleBgRt = titleBgGO.GetComponent<RectTransform>();
-		titleBgRt.anchorMin = new Vector2(0, 1f);
-		titleBgRt.anchorMax = new Vector2(1, 1f);
-		titleBgRt.pivot = new Vector2(0.5f, 1f);
-		titleBgRt.sizeDelta = new Vector2(0, 60);
-		titleBgRt.anchoredPosition = new Vector2(0, 0);
-
-			GameObject titleGO = new GameObject("Title");
-		titleGO.transform.SetParent(titleBgGO.transform, false);
-			Text titleText = titleGO.AddComponent<Text>();
-			titleText.text = "Choisissez votre destination";
-			titleText.alignment = TextAnchor.MiddleCenter;
-		titleText.color = Color.white;
-			titleText.font = GetUIFont();
-		titleText.fontSize = 20;
-		titleText.fontStyle = FontStyle.Bold;
-			RectTransform titleRt = titleGO.GetComponent<RectTransform>();
-		titleRt.anchorMin = Vector2.zero;
-		titleRt.anchorMax = Vector2.one;
-		titleRt.offsetMin = Vector2.zero;
-		titleRt.offsetMax = Vector2.zero;
+		// Titre GRAND et moderne
+		UIHelper.CreateText(panelGO, "🏙️ Choisissez votre destination",
+			new Vector2(570, 50), new Vector2(0, 160),
+			24, FontStyle.Bold, new Color(0.2f, 0.8f, 1f, 1f));
 
 		// Create a simple white sprite (avoiding missing resource errors)
 		Texture2D tex = new Texture2D(1, 1);
@@ -173,19 +149,14 @@ namespace Mode3D.Destinations
 		tex.Apply();
 		uiRoundedSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
 
-		// Dropdown field (collapsed by default) - taille réduite
-		GameObject dropdownFieldGO = new GameObject("DropdownField");
-		dropdownFieldGO.transform.SetParent(panelGO.transform, false);
-		var fieldBg = dropdownFieldGO.AddComponent<Image>();
-		fieldBg.color = Color.white;
-		var fieldOutline = dropdownFieldGO.AddComponent<Outline>();
-		fieldOutline.effectColor = new Color(0.7f, 0.7f, 0.7f, 1f);
-		fieldOutline.effectDistance = new Vector2(1, -1);
-		var fieldRt = dropdownFieldGO.GetComponent<RectTransform>();
-		fieldRt.anchorMin = new Vector2(0.5f, 0.5f);
-		fieldRt.anchorMax = new Vector2(0.5f, 0.5f);
-		fieldRt.sizeDelta = new Vector2(320, 45); // Réduit
-		fieldRt.anchoredPosition = new Vector2(0, 12);
+		// Dropdown field arrondi moderne
+		GameObject dropdownFieldGO = UIHelper.CreateRoundedPanel(
+			panelGO,
+			new Vector2(500, 55), // Plus grand
+			new Vector2(0, 60),
+			Color.white,
+			10f
+		);
 
 		// Dropdown label
 		GameObject fieldLabelGO = new GameObject("Label");
@@ -226,19 +197,14 @@ namespace Mode3D.Destinations
 		fieldColors.pressedColor = new Color(0.9f, 0.9f, 0.9f, 1f);
 		fieldBtn.colors = fieldColors;
 
-		// Dropdown list container (initially hidden) - taille adaptée
-		dropdownList = new GameObject("DropdownList");
-		dropdownList.transform.SetParent(panelGO.transform, false);
-		var listBg = dropdownList.AddComponent<Image>();
-		listBg.color = Color.white;
-		var listOutline = dropdownList.AddComponent<Outline>();
-		listOutline.effectColor = new Color(0.7f, 0.7f, 0.7f, 1f);
-		listOutline.effectDistance = new Vector2(1, -1);
-		var listRt = dropdownList.GetComponent<RectTransform>();
-		listRt.anchorMin = new Vector2(0.5f, 0.5f);
-		listRt.anchorMax = new Vector2(0.5f, 0.5f);
-		listRt.sizeDelta = new Vector2(320, 0); // Will be sized dynamically - réduit
-		listRt.anchoredPosition = new Vector2(0, -50); // Below the field
+		// Dropdown list container arrondi (initially hidden) - taille plus petite
+		dropdownList = UIHelper.CreateRoundedPanel(
+			panelGO,
+			new Vector2(500, 200), // Liste compacte
+			new Vector2(0, -40),
+			Color.white,
+			5f
+		);
 		dropdownList.SetActive(false);
 
 		// Scroll rect for dropdown list
@@ -277,9 +243,9 @@ namespace Mode3D.Destinations
 		scroll.vertical = true;
 
 			cityItemButtons.Clear();
-		float itemHeight = 70f;
-		float itemSpacing = 2f;
-		int maxVisibleItems = 4; // Show max 4 items before scrolling
+		float itemHeight = 50f; // Items plus compacts
+		float itemSpacing = 3f;
+		int maxVisibleItems = 4;
 		
 			for (int i = 0; i < destinations.Count; i++)
 			{
@@ -296,6 +262,7 @@ namespace Mode3D.Destinations
 				var bg = item.AddComponent<Image>();
 			bg.color = Color.white;
 
+				// Thumbnail plus petit
 				GameObject thumbGO = new GameObject("Thumb");
 				thumbGO.transform.SetParent(item.transform, false);
 				var thumb = thumbGO.AddComponent<Image>();
@@ -305,29 +272,29 @@ namespace Mode3D.Destinations
 				}
 			else
 			{
-				// Default placeholder color
 				thumb.color = new Color(0.85f, 0.85f, 0.85f, 1f);
 			}
 				var thumbRt = thumbGO.GetComponent<RectTransform>();
 				thumbRt.anchorMin = new Vector2(0, 0.5f);
 				thumbRt.anchorMax = new Vector2(0, 0.5f);
-			thumbRt.sizeDelta = new Vector2(90, 55);
-			thumbRt.anchoredPosition = new Vector2(50, 0);
+			thumbRt.sizeDelta = new Vector2(70, 40); // Plus petit
+			thumbRt.anchoredPosition = new Vector2(45, 0);
 
+				// Label plus grand et visible
 				GameObject labelGO = new GameObject("Label");
 				labelGO.transform.SetParent(item.transform, false);
 				var label = labelGO.AddComponent<Text>();
 				label.text = string.IsNullOrWhiteSpace(d.displayName) ? "(Sans nom)" : d.displayName;
 				label.font = GetUIFont();
-			label.fontSize = 16;
-			label.fontStyle = FontStyle.Normal;
+			label.fontSize = 18; // Plus grand
+			label.fontStyle = FontStyle.Bold; // Bold pour visibilité
 				label.alignment = TextAnchor.MiddleLeft;
-			label.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+			label.color = new Color(0.1f, 0.1f, 0.1f, 1f); // Plus foncé pour contraste
 				var labelRt = labelGO.GetComponent<RectTransform>();
 				labelRt.anchorMin = new Vector2(0, 0);
 				labelRt.anchorMax = new Vector2(1, 1);
-			labelRt.offsetMin = new Vector2(110, 0);
-			labelRt.offsetMax = new Vector2(-10, 0);
+			labelRt.offsetMin = new Vector2(95, 0); // Ajusté
+			labelRt.offsetMax = new Vector2(-15, 0);
 
 				var btn = item.AddComponent<Button>();
 				int captured = i;
@@ -347,46 +314,22 @@ namespace Mode3D.Destinations
 		float totalHeight = destinations.Count * (itemHeight + itemSpacing);
 		contentRt.sizeDelta = new Vector2(0, totalHeight);
 		
-		// Limit dropdown height to max visible items
+		// Limite la hauteur de la liste (compacte)
 		float maxDropdownHeight = Mathf.Min(totalHeight + 10, maxVisibleItems * (itemHeight + itemSpacing) + 10);
-		listRt.sizeDelta = new Vector2(320, maxDropdownHeight); // Adapté à la nouvelle largeur
+		// La taille est déjà définie dans CreateRoundedPanel (500×200)
 
-		// Validate button - modern style - taille réduite
-			GameObject btnGO = new GameObject("ValidateButton");
-			btnGO.transform.SetParent(panelGO.transform, false);
-			validateButton = btnGO.AddComponent<Button>();
-			Image btnImg = btnGO.AddComponent<Image>();
-		btnImg.color = new Color(0.15f, 0.6f, 0.9f, 1f); // Match title blue
-			RectTransform btnRt = btnGO.GetComponent<RectTransform>();
-			btnRt.anchorMin = new Vector2(0.5f, 0);
-			btnRt.anchorMax = new Vector2(0.5f, 0);
-		btnRt.sizeDelta = new Vector2(200, 40); // Plus petit
-			btnRt.anchoredPosition = new Vector2(0, 20);
+		// Validate button moderne arrondi
+		GameObject btnGO = UIHelper.CreateRoundedButton(
+			panelGO,
+			"✓ VALIDER",
+			new Vector2(280, 55), // Grand bouton
+			new Vector2(0, -145),
+			new Color(0.2f, 0.8f, 0.4f, 1f),
+			OnValidateClicked
+		);
 		
-		// Add button color transitions
-		var btnColors = validateButton.colors;
-		btnColors.normalColor = new Color(0.15f, 0.6f, 0.9f, 1f);
-		btnColors.highlightedColor = new Color(0.2f, 0.7f, 1f, 1f);
-		btnColors.pressedColor = new Color(0.1f, 0.5f, 0.8f, 1f);
-		btnColors.disabledColor = new Color(0.6f, 0.6f, 0.6f, 0.5f);
-		validateButton.colors = btnColors;
-
-			GameObject btnTextGO = new GameObject("Text");
-			btnTextGO.transform.SetParent(btnGO.transform, false);
-			Text btnText = btnTextGO.AddComponent<Text>();
-		btnText.text = "VALIDER";
-		btnText.fontSize = 18;
-		btnText.fontStyle = FontStyle.Bold;
-			btnText.alignment = TextAnchor.MiddleCenter;
-			btnText.color = Color.white;
-			btnText.font = GetUIFont();
-			RectTransform btnTextRt = btnTextGO.GetComponent<RectTransform>();
-			btnTextRt.anchorMin = new Vector2(0, 0);
-			btnTextRt.anchorMax = new Vector2(1, 1);
-			btnTextRt.sizeDelta = Vector2.zero;
-
-			validateButton.onClick.AddListener(OnValidateClicked);
-			validateButton.interactable = false;
+		validateButton = btnGO.GetComponent<Button>();
+		validateButton.interactable = false;
 		}
 
 		private Font GetUIFont()
@@ -594,74 +537,50 @@ namespace Mode3D.Destinations
 			uiRoundedSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
 		}
 
-		// Panel - Taille réduite (calendrier)
-			GameObject panelGO = new GameObject("Panel");
-			panelGO.transform.SetParent(canvasGO.transform, false);
-			var panelImg = panelGO.AddComponent<Image>();
-			panelImg.color = panelColor;
-			var panelRt = panelGO.GetComponent<RectTransform>();
-			panelRt.anchorMin = new Vector2(0.5f, 0.5f);
-			panelRt.anchorMax = new Vector2(0.5f, 0.5f);
-		panelRt.sizeDelta = new Vector2(400, 350); // Plus compact
-			panelRt.anchoredPosition = Vector2.zero;
+		// Panel GRAND avec calendrier plus petit
+		GameObject panelGO = UIHelper.CreateRoundedPanel(
+			canvasGO,
+			new Vector2(700, 550), // GRAND conteneur
+			Vector2.zero,
+			new Color(0.03f, 0.03f, 0.03f, 0.95f),
+			25f
+		);
 
-		// Title with modern background
-		GameObject titleBgGO = new GameObject("TitleBackground");
-		titleBgGO.transform.SetParent(panelGO.transform, false);
-		Image titleBg = titleBgGO.AddComponent<Image>();
-		titleBg.color = new Color(0.15f, 0.6f, 0.9f, 1f);
-		RectTransform titleBgRt = titleBgGO.GetComponent<RectTransform>();
-		titleBgRt.anchorMin = new Vector2(0, 1f);
-		titleBgRt.anchorMax = new Vector2(1, 1f);
-		titleBgRt.pivot = new Vector2(0.5f, 1f);
-		titleBgRt.sizeDelta = new Vector2(0, 60);
-		titleBgRt.anchoredPosition = new Vector2(0, 0);
+		// Bouton retour
+		UIHelper.CreateBackButton(panelGO, new Vector2(-310, 260),
+			() => {
+				// Effacer l'image de ville
+				GameObject cityView = GameObject.Find("WindowCityView");
+				if (cityView != null) Destroy(cityView);
+				
+				Destroy(canvasGO);
+				CreateSelectorUI();
+			});
 
-			GameObject titleGO = new GameObject("Title");
-		titleGO.transform.SetParent(titleBgGO.transform, false);
-			var titleText = titleGO.AddComponent<Text>();
-			titleText.text = "Sélectionnez vos dates";
-			titleText.font = GetUIFont();
-		titleText.fontSize = 20;
-		titleText.fontStyle = FontStyle.Bold;
-			titleText.alignment = TextAnchor.MiddleCenter;
-		titleText.color = Color.white;
-			var titleRt = titleGO.GetComponent<RectTransform>();
-		titleRt.anchorMin = Vector2.zero;
-		titleRt.anchorMax = Vector2.one;
-		titleRt.offsetMin = Vector2.zero;
-		titleRt.offsetMax = Vector2.zero;
+		// Titre GRAND
+		UIHelper.CreateText(panelGO, "📅 Sélectionnez vos dates",
+			new Vector2(650, 50), new Vector2(0, 240),
+			24, FontStyle.Bold, new Color(0.2f, 0.8f, 1f, 1f));
 
-		// Calendar grid (current month) - modern styling
+		// Calendar grid (current month) - plus petit et centré
 			DateTime now = DateTime.Now;
 			DateTime first = new DateTime(now.Year, now.Month, 1);
 			int daysInMonth = DateTime.DaysInMonth(now.Year, now.Month);
-			int startOffset = (int)first.DayOfWeek; // Sunday=0
+			int startOffset = (int)first.DayOfWeek;
 
 		// Month label
-		GameObject monthLabelGO = new GameObject("MonthLabel");
-		monthLabelGO.transform.SetParent(panelGO.transform, false);
-		var monthLabel = monthLabelGO.AddComponent<Text>();
-		monthLabel.text = now.ToString("MMMM yyyy").ToUpper();
-		monthLabel.font = GetUIFont();
-		monthLabel.fontSize = 16;
-		monthLabel.fontStyle = FontStyle.Bold;
-		monthLabel.alignment = TextAnchor.MiddleCenter;
-		monthLabel.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-		var monthLabelRt = monthLabelGO.GetComponent<RectTransform>();
-		monthLabelRt.anchorMin = new Vector2(0.5f, 1f);
-		monthLabelRt.anchorMax = new Vector2(0.5f, 1f);
-		monthLabelRt.pivot = new Vector2(0.5f, 1f);
-		monthLabelRt.sizeDelta = new Vector2(520, 30);
-		monthLabelRt.anchoredPosition = new Vector2(0, -75);
+		UIHelper.CreateText(panelGO, now.ToString("MMMM yyyy").ToUpper(),
+			new Vector2(450, 35), new Vector2(0, 160),
+			18, FontStyle.Bold, new Color(0.3f, 0.3f, 0.3f, 1f));
 
+		// Grille calendrier PLUS PETITE
 			GameObject gridGO = new GameObject("CalendarGrid");
 			gridGO.transform.SetParent(panelGO.transform, false);
 			var gridRt = gridGO.AddComponent<RectTransform>();
 			gridRt.anchorMin = new Vector2(0.5f, 0.5f);
 			gridRt.anchorMax = new Vector2(0.5f, 0.5f);
-		gridRt.sizeDelta = new Vector2(520, 270);
-		gridRt.anchoredPosition = new Vector2(0, -20);
+		gridRt.sizeDelta = new Vector2(450, 240); // Plus petit
+		gridRt.anchoredPosition = new Vector2(0, 10);
 
 			int rows = 6, cols = 7;
 		float cellW = gridRt.sizeDelta.x / cols - 6;
@@ -726,79 +645,17 @@ namespace Mode3D.Destinations
 				}
 			}
 
-		// Validate button - modern style
-			GameObject btnGO = new GameObject("ValidateButton");
-			btnGO.transform.SetParent(panelGO.transform, false);
-			var btn = btnGO.AddComponent<Button>();
-			var btnImg = btnGO.AddComponent<Image>();
-		btnImg.color = new Color(0.15f, 0.6f, 0.9f, 1f);
-			var btnRt = btnGO.GetComponent<RectTransform>();
-			btnRt.anchorMin = new Vector2(0.5f, 0);
-			btnRt.anchorMax = new Vector2(0.5f, 0);
-		btnRt.sizeDelta = new Vector2(250, 50);
-		btnRt.anchoredPosition = new Vector2(0, 25);
-		
-		// Button color transitions
-		var btnColors = btn.colors;
-		btnColors.normalColor = new Color(0.15f, 0.6f, 0.9f, 1f);
-		btnColors.highlightedColor = new Color(0.2f, 0.7f, 1f, 1f);
-		btnColors.pressedColor = new Color(0.1f, 0.5f, 0.8f, 1f);
-		btn.colors = btnColors;
+		// Validate button moderne arrondi GRAND
+		UIHelper.CreateRoundedButton(
+			panelGO,
+			"✓ VALIDER LES DATES",
+			new Vector2(320, 60),
+			new Vector2(0, -215),
+			new Color(0.2f, 0.8f, 0.4f, 1f),
+			OnDatesValidateClicked
+		);
 
-			GameObject textGO = new GameObject("Text");
-			textGO.transform.SetParent(btnGO.transform, false);
-			var t = textGO.AddComponent<Text>();
-		t.text = "VALIDER";
-			t.font = GetUIFont();
-		t.fontSize = 18;
-		t.fontStyle = FontStyle.Bold;
-			t.alignment = TextAnchor.MiddleCenter;
-			t.color = Color.white;
-			var trt = textGO.GetComponent<RectTransform>();
-			trt.anchorMin = Vector2.zero;
-			trt.anchorMax = Vector2.one;
-			trt.offsetMin = Vector2.zero;
-			trt.offsetMax = Vector2.zero;
-
-			btn.onClick.AddListener(OnDatesValidateClicked);
-
-		// Bouton retour
-		GameObject backBtnGO = new GameObject("BackButton");
-		backBtnGO.transform.SetParent(panelGO.transform, false);
-		var backBtn = backBtnGO.AddComponent<Button>();
-		var backBtnImg = backBtnGO.AddComponent<Image>();
-		backBtnImg.color = new Color(0.6f, 0.6f, 0.6f, 1f);
-		var backBtnRt = backBtnGO.GetComponent<RectTransform>();
-		backBtnRt.anchorMin = new Vector2(0, 1);
-		backBtnRt.anchorMax = new Vector2(0, 1);
-		backBtnRt.sizeDelta = new Vector2(100, 35);
-		backBtnRt.anchoredPosition = new Vector2(60, -20);
-
-		GameObject backTextGO = new GameObject("Text");
-		backTextGO.transform.SetParent(backBtnGO.transform, false);
-		var backT = backTextGO.AddComponent<Text>();
-		backT.text = "← Retour";
-		backT.font = GetUIFont();
-		backT.fontSize = 14;
-		backT.fontStyle = FontStyle.Bold;
-		backT.alignment = TextAnchor.MiddleCenter;
-		backT.color = Color.white;
-		var backTrt = backTextGO.GetComponent<RectTransform>();
-		backTrt.anchorMin = Vector2.zero;
-		backTrt.anchorMax = Vector2.one;
-		backTrt.offsetMin = Vector2.zero;
-		backTrt.offsetMax = Vector2.zero;
-
-		backBtn.onClick.AddListener(() => {
-			Destroy(canvasGO);
-			// Effacer l'image de ville si elle existe
-			GameObject cityView = GameObject.Find("WindowCityView");
-			if (cityView != null)
-			{
-				Destroy(cityView);
-			}
-			CreateSelectorUI();
-		});
+		// Bouton retour déjà créé en haut (ligne 550)
 		}
 
 		private void OnCalendarDateClicked(DateTime date)
