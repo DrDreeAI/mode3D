@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4fadc55857d0f1f4194a2123fc71f1db
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 161171
+  packageName: Wearable And Clothing Controller For Fbx
+  packageVersion: 1.0
+  assetPath: Assets/CodeFirst/WearableController/WearableOutfit.cs
+  uploadId: 359775
