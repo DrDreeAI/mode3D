@@ -8,18 +8,9 @@ public class DatePickerUI : MonoBehaviour
 
     public void OpenPicker()
     {
-#if UNITY_EDITOR
-        // Simule la date dans Unity Editor
+        // Utilise la date actuelle (AndroidDatePicker n'est pas disponible)
         outputField.text = DateTime.Now.ToString("dd/MM/yyyy");
-        Debug.Log("Date simulée : " + outputField.text);
-#elif UNITY_ANDROID
-        // Appelle le vrai date picker Android
-        var picker = new AndroidDatePicker();
-        picker.Show(DateTime.Now, OnDateSelected);
-#else
-        // Fallback pour autres plateformes
-        outputField.text = DateTime.Now.ToString("dd/MM/yyyy");
-#endif
+        Debug.Log("Date sélectionnée : " + outputField.text);
     }
 
     private void OnDateSelected(DateTime value)
