@@ -119,13 +119,10 @@ namespace Mode3D.Destinations
 
 			OutfitPresentation current = allOutfits[currentOutfitIndex];
 
-			// Panel principal
-			GameObject panel = CreatePanel();
+		// Panel principal (bouton retour créé dans CreatePanel)
+		GameObject panel = CreatePanel();
 
-			// Bouton retour
-			CreateBackButton(panel);
-
-			float yPos = 210f; // Ajusté pour grand panel
+		float yPos = 210f; // Ajusté pour grand panel
 
 			// Progression GRANDE
 			UIHelper.CreateText(panel, $"Tenue {currentOutfitIndex + 1} / {allOutfits.Count}", 
@@ -190,35 +187,37 @@ namespace Mode3D.Destinations
 			ShowMannequinFor(current);
 		}
 
-		private GameObject CreatePanel()
-		{
-			// Panel arrondi moderne GRAND et AÉRÉ
-			GameObject panel = UIHelper.CreateRoundedPanel(
-				canvas.gameObject,
-				new Vector2(700, 600), // Plus grand et aéré
-				Vector2.zero,
-				new Color(0.03f, 0.03f, 0.03f, 0.95f),
-				25f // Grandes marges
-			);
+	private GameObject CreatePanel()
+	{
+		// Panel arrondi moderne GRAND et AÉRÉ
+		GameObject panel = UIHelper.CreateRoundedPanel(
+			canvas.gameObject,
+			new Vector2(700, 600), // Plus grand et aéré
+			Vector2.zero,
+			new Color(0.03f, 0.03f, 0.03f, 0.95f),
+			25f // Grandes marges
+		);
 
-			// Titre GRAND
-			UIHelper.CreateText(panel, "👗 Présentation des Tenues",
-				new Vector2(650, 50), new Vector2(0, 270),
-				26, FontStyle.Bold, new Color(0.2f, 0.8f, 1f, 1f));
+		// Titre GRAND
+		UIHelper.CreateText(panel, "👗 Présentation des Tenues",
+			new Vector2(650, 50), new Vector2(0, 270),
+			26, FontStyle.Bold, new Color(0.2f, 0.8f, 1f, 1f));
+		
+		// Bouton retour au-dessus à gauche du panel
+		UIHelper.CreateBackButton(canvas.gameObject, new Vector2(-240, 330),
+			() => { 
+				CleanupDisplays();
+				if (onBack != null) { Destroy(canvas.gameObject); onBack(); } 
+			});
 
-			return panel;
-		}
+		return panel;
+	}
 
-		private void CreateBackButton(GameObject parent)
-		{
-			UIHelper.CreateBackButton(parent, new Vector2(-290, 280),
-				() => {
-					ClearMannequin();
-					if (ghostDisplay != null) Destroy(ghostDisplay.gameObject);
-					Destroy(canvas.gameObject);
-					if (onBack != null) onBack();
-				});
-		}
+	private void CleanupDisplays()
+	{
+		ClearMannequin();
+		if (ghostDisplay != null) Destroy(ghostDisplay.gameObject);
+	}
 
 		private void ChangeToPreviousMaterial()
 		{
@@ -307,16 +306,42 @@ namespace Mode3D.Destinations
 			);
 		}
 
-		private void ShowThankYou(CircularOutfitDisplay circDisplay)
+	private void ShowThankYou(CircularOutfitDisplay circDisplay)
+	{
+		GameObject thankYouGO = new GameObject("ThankYouUI");
+		ThankYouUI thankYouUI = thankYouGO.AddComponent<ThankYouUI>();
+		
+		// Calculer prix total
+		float totalPrice = CalculateTotalPrice();
+		string destination = OutfitSelection.Instance != null ? OutfitSelection.Instance.selectedDestination : "";
+		
+		thankYouUI.Show(() => {
+			// Retour à l'accueil (sélection ville)
+			Destroy(thankYouGO);
+			RestartApplication();
+		}, circDisplay, allOutfits, totalPrice, destination);
+	}
+	
+	private float CalculateTotalPrice()
+	{
+		float total = 0f;
+		foreach (var outfit in allOutfits)
 		{
-			GameObject thankYouGO = new GameObject("ThankYouUI");
-			ThankYouUI thankYouUI = thankYouGO.AddComponent<ThankYouUI>();
-			thankYouUI.Show(() => {
-				// Retour à l'accueil (sélection ville)
-				Destroy(thankYouGO);
-				RestartApplication();
-			}, circDisplay); // Passer le circularDisplay
+			total += GetPriceForCategory(outfit.category);
 		}
+		return total;
+	}
+	
+	private float GetPriceForCategory(OutfitType category)
+	{
+		switch (category)
+		{
+			case OutfitType.Chill: return 45.99f;
+			case OutfitType.Sport: return 65.99f;
+			case OutfitType.Business: return 120.00f;
+			default: return 50.00f;
+		}
+	}
 
 		private void RestartApplication()
 		{

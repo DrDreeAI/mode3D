@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -48,10 +49,14 @@ namespace Mode3D.Destinations
 	private Text dropdownLabel;
 	private bool isDropdownOpen = false;
 
-		// Date range state (for next screen)
-		private DateTime? startDate;
-		private DateTime? endDate;
-		private Dictionary<DateTime, Image> dateCellToImage = new Dictionary<DateTime, Image>();
+	// Date range state (for next screen)
+	private DateTime? startDate;
+	private DateTime? endDate;
+	private Dictionary<DateTime, Image> dateCellToImage = new Dictionary<DateTime, Image>();
+	private DateTime currentCalendarMonth;
+	private Text monthYearLabelText;
+	private GameObject calendarCanvas;
+	private GameObject calendarPanel;
 
 	private void Start()
 	{
@@ -138,10 +143,23 @@ namespace Mode3D.Destinations
 				25f
 			);
 
-		// Titre GRAND et moderne
-		UIHelper.CreateText(panelGO, "🏙️ Choisissez votre destination",
-			new Vector2(570, 50), new Vector2(0, 160),
-			24, FontStyle.Bold, new Color(0.2f, 0.8f, 1f, 1f));
+	// Titre GRAND et moderne
+	UIHelper.CreateText(panelGO, "🏙️ Choisissez votre destination",
+		new Vector2(570, 50), new Vector2(0, 160),
+		24, FontStyle.Bold, new Color(0.2f, 0.8f, 1f, 1f));
+
+	// Bouton "Mes commandes" juste au-dessus du panel
+	if (OrderManager.HasOrder())
+	{
+		UIHelper.CreateRoundedButton(
+			canvasGO, // Attaché au canvas, pas au panel
+			"📦 Mes commandes",
+			new Vector2(180, 45),
+			new Vector2(200, 235), // Juste au-dessus du panel (panel hauteur 400, haut = +200)
+			new Color(0.4f, 0.6f, 0.9f, 1f),
+			ShowMyOrders
+		);
+	}
 
 		// Create a simple white sprite (avoiding missing resource errors)
 		Texture2D tex = new Texture2D(1, 1);
@@ -197,11 +215,13 @@ namespace Mode3D.Destinations
 		fieldColors.pressedColor = new Color(0.9f, 0.9f, 0.9f, 1f);
 		fieldBtn.colors = fieldColors;
 
-		// Dropdown list container arrondi (initially hidden) - taille plus petite
+		// Dropdown list container arrondi (initially hidden) - positionné au-dessus du bouton valider
+		// Position: au-dessus du bouton valider qui est à y = -145, donc la liste doit être vers y = -40 à -90
+		float dropdownYPos = -40f; // Position au-dessus du bouton valider
 		dropdownList = UIHelper.CreateRoundedPanel(
 			panelGO,
-			new Vector2(500, 200), // Liste compacte
-			new Vector2(0, -40),
+			new Vector2(500, 180), // Liste limitée en hauteur
+			new Vector2(0, dropdownYPos),
 			Color.white,
 			5f
 		);
@@ -222,7 +242,7 @@ namespace Mode3D.Destinations
 			var mask = viewportGO.AddComponent<Mask>();
 			mask.showMaskGraphic = false;
 			var vpImg = viewportGO.AddComponent<Image>();
-			vpImg.color = new Color(1,1,1,0);
+			vpImg.color = new Color(1,1,1,1); // Fond blanc pour le viewport
 			var vpRt = viewportGO.GetComponent<RectTransform>();
 			vpRt.anchorMin = Vector2.zero;
 			vpRt.anchorMax = Vector2.one;
@@ -241,11 +261,12 @@ namespace Mode3D.Destinations
 			scroll.viewport = vpRt;
 			scroll.horizontal = false;
 		scroll.vertical = true;
+		scroll.scrollSensitivity = 20f;
 
 			cityItemButtons.Clear();
 		float itemHeight = 50f; // Items plus compacts
 		float itemSpacing = 3f;
-		int maxVisibleItems = 4;
+		int maxVisibleItems = 3; // Limiter à 3 items visibles pour garder la liste au-dessus du bouton
 		
 			for (int i = 0; i < destinations.Count; i++)
 			{
@@ -260,7 +281,7 @@ namespace Mode3D.Destinations
 			itemRt.anchoredPosition = new Vector2(0, -(i * (itemHeight + itemSpacing)));
 
 				var bg = item.AddComponent<Image>();
-			bg.color = Color.white;
+			bg.color = Color.white; // Fond blanc
 
 				// Thumbnail plus petit
 				GameObject thumbGO = new GameObject("Thumb");
@@ -280,7 +301,7 @@ namespace Mode3D.Destinations
 			thumbRt.sizeDelta = new Vector2(70, 40); // Plus petit
 			thumbRt.anchoredPosition = new Vector2(45, 0);
 
-				// Label plus grand et visible
+				// Label en NOIR sur fond blanc
 				GameObject labelGO = new GameObject("Label");
 				labelGO.transform.SetParent(item.transform, false);
 				var label = labelGO.AddComponent<Text>();
@@ -289,7 +310,7 @@ namespace Mode3D.Destinations
 			label.fontSize = 18; // Plus grand
 			label.fontStyle = FontStyle.Bold; // Bold pour visibilité
 				label.alignment = TextAnchor.MiddleLeft;
-			label.color = new Color(0.1f, 0.1f, 0.1f, 1f); // Plus foncé pour contraste
+			label.color = Color.black; // NOIR sur fond blanc
 				var labelRt = labelGO.GetComponent<RectTransform>();
 				labelRt.anchorMin = new Vector2(0, 0);
 				labelRt.anchorMax = new Vector2(1, 1);
@@ -302,7 +323,7 @@ namespace Mode3D.Destinations
 			
 			// Add color transition for button
 			var colors = btn.colors;
-			colors.normalColor = Color.white;
+			colors.normalColor = Color.white; // Fond blanc
 			colors.highlightedColor = new Color(0.85f, 0.92f, 1f, 1f);
 			colors.pressedColor = new Color(0.7f, 0.85f, 1f, 1f);
 			btn.colors = colors;
@@ -314,9 +335,10 @@ namespace Mode3D.Destinations
 		float totalHeight = destinations.Count * (itemHeight + itemSpacing);
 		contentRt.sizeDelta = new Vector2(0, totalHeight);
 		
-		// Limite la hauteur de la liste (compacte)
+		// Limite la hauteur de la liste (compacte) - max 3 items visibles
 		float maxDropdownHeight = Mathf.Min(totalHeight + 10, maxVisibleItems * (itemHeight + itemSpacing) + 10);
-		// La taille est déjà définie dans CreateRoundedPanel (500×200)
+		var dropdownRt = dropdownList.GetComponent<RectTransform>();
+		dropdownRt.sizeDelta = new Vector2(500, maxDropdownHeight);
 
 		// Validate button moderne arrondi
 		GameObject btnGO = UIHelper.CreateRoundedButton(
@@ -477,23 +499,23 @@ namespace Mode3D.Destinations
 			}
 		}
 
-		private void TryAutoPopulateDestinations()
-		{
-			// Tries to load common city names from Resources/Destinations
-			AddIfFound("Paris");
-			AddIfFound("NewYork");
-			AddIfFound("Londres");
-			AddIfFound("Dubai");
-		}
+	private void TryAutoPopulateDestinations()
+	{
+		// Tries to load common city names from Resources/Destinations
+		AddIfFound("paris", "Paris");
+		AddIfFound("newyork", "New York");
+		AddIfFound("london", "Londres");
+		AddIfFound("dubai", "Dubaï");
+	}
 
-		private void AddIfFound(string name)
+	private void AddIfFound(string fileName, string displayName)
+	{
+		var tex = Resources.Load<Texture2D>("Destinations/" + fileName);
+		if (tex != null)
 		{
-			var tex = Resources.Load<Texture2D>("Destinations/" + name);
-			if (tex != null)
-			{
-				destinations.Add(new DestinationItem { displayName = name, imageTexture = tex });
-			}
+			destinations.Add(new DestinationItem { displayName = displayName, imageTexture = tex });
 		}
+	}
 
 		private void CreateBlankScreen()
 		{
@@ -537,25 +559,25 @@ namespace Mode3D.Destinations
 			uiRoundedSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
 		}
 
-		// Panel GRAND avec calendrier plus petit
-		GameObject panelGO = UIHelper.CreateRoundedPanel(
-			canvasGO,
-			new Vector2(700, 550), // GRAND conteneur
-			Vector2.zero,
-			new Color(0.03f, 0.03f, 0.03f, 0.95f),
-			25f
-		);
+	// Panel GRAND avec calendrier plus petit
+	GameObject panelGO = UIHelper.CreateRoundedPanel(
+		canvasGO,
+		new Vector2(700, 550), // GRAND conteneur
+		Vector2.zero,
+		new Color(0.03f, 0.03f, 0.03f, 0.95f),
+		25f
+	);
 
-		// Bouton retour
-		UIHelper.CreateBackButton(panelGO, new Vector2(-310, 260),
-			() => {
-				// Effacer l'image de ville
-				GameObject cityView = GameObject.Find("WindowCityView");
-				if (cityView != null) Destroy(cityView);
-				
-				Destroy(canvasGO);
-				CreateSelectorUI();
-			});
+	// Flèche retour au-dessus à gauche du panel
+	UIHelper.CreateBackButton(canvasGO, new Vector2(-240, 305),
+		() => {
+			// Effacer l'image de ville
+			GameObject cityView = GameObject.Find("WindowCityView");
+			if (cityView != null) Destroy(cityView);
+			
+			Destroy(canvasGO);
+			CreateSelectorUI();
+		});
 
 		// Titre GRAND
 		UIHelper.CreateText(panelGO, "📅 Sélectionnez vos dates",
@@ -568,10 +590,50 @@ namespace Mode3D.Destinations
 			int daysInMonth = DateTime.DaysInMonth(now.Year, now.Month);
 			int startOffset = (int)first.DayOfWeek;
 
-		// Month label
-		UIHelper.CreateText(panelGO, now.ToString("MMMM yyyy").ToUpper(),
-			new Vector2(450, 35), new Vector2(0, 160),
-			18, FontStyle.Bold, new Color(0.3f, 0.3f, 0.3f, 1f));
+	// Header avec flèches et mois/année
+	GameObject headerGO = new GameObject("CalendarHeader");
+	headerGO.transform.SetParent(panelGO.transform, false);
+	var headerRt = headerGO.AddComponent<RectTransform>();
+	headerRt.anchorMin = new Vector2(0.5f, 0.5f);
+	headerRt.anchorMax = new Vector2(0.5f, 0.5f);
+	headerRt.sizeDelta = new Vector2(450, 40);
+	headerRt.anchoredPosition = new Vector2(0, 160);
+
+	// Flèche précédente (gauche)
+	GameObject prevBtn = UIHelper.CreateRoundedButton(
+		headerGO,
+		"◄",
+		new Vector2(50, 35),
+		new Vector2(-200, 0),
+		new Color(0.2f, 0.8f, 1f, 1f),
+		() => ChangeMonth(-1)
+	);
+
+	// Flèche suivante (droite)
+	GameObject nextBtn = UIHelper.CreateRoundedButton(
+		headerGO,
+		"►",
+		new Vector2(50, 35),
+		new Vector2(200, 0),
+		new Color(0.2f, 0.8f, 1f, 1f),
+		() => ChangeMonth(1)
+	);
+
+	// Label mois/année au centre en français avec couleur des flèches
+	CultureInfo frenchCulture = new CultureInfo("fr-FR");
+	string monthYear = now.ToString("MMMM yyyy", frenchCulture);
+	// Mettre majuscule au début
+	monthYear = char.ToUpper(monthYear[0]) + monthYear.Substring(1);
+	
+	GameObject monthYearGO = UIHelper.CreateText(headerGO, monthYear,
+		new Vector2(300, 35), new Vector2(0, 0),
+		18, FontStyle.Bold, new Color(0.2f, 0.8f, 1f, 1f)); // Même couleur que les flèches
+	monthYearLabelText = monthYearGO.GetComponent<Text>();
+
+	// Sauvegarder les références
+	currentCalendarMonth = now;
+	calendarCanvas = canvasGO;
+	calendarPanel = panelGO;
 
 		// Grille calendrier PLUS PETITE
 			GameObject gridGO = new GameObject("CalendarGrid");
@@ -655,10 +717,121 @@ namespace Mode3D.Destinations
 			OnDatesValidateClicked
 		);
 
-		// Bouton retour déjà créé en haut (ligne 550)
-		}
+	// Bouton retour déjà créé en haut (ligne 550)
+	}
 
-		private void OnCalendarDateClicked(DateTime date)
+	private void ChangeMonth(int direction)
+	{
+		currentCalendarMonth = currentCalendarMonth.AddMonths(direction);
+		
+		// Mettre à jour le label mois/année en français
+		if (monthYearLabelText != null)
+		{
+			CultureInfo frenchCulture = new CultureInfo("fr-FR");
+			string monthYear = currentCalendarMonth.ToString("MMMM yyyy", frenchCulture);
+			// Mettre majuscule au début
+			monthYear = char.ToUpper(monthYear[0]) + monthYear.Substring(1);
+			monthYearLabelText.text = monthYear;
+		}
+		
+		// Recréer la grille du calendrier
+		RefreshCalendarGrid();
+	}
+
+	private void RefreshCalendarGrid()
+	{
+		if (calendarPanel == null) return;
+		
+		// Trouver et détruire l'ancienne grille
+		Transform oldGrid = calendarPanel.transform.Find("CalendarGrid");
+		if (oldGrid != null)
+		{
+			Destroy(oldGrid.gameObject);
+		}
+		
+		// Recréer la grille avec le nouveau mois
+		DateTime now = currentCalendarMonth;
+		DateTime first = new DateTime(now.Year, now.Month, 1);
+		int daysInMonth = DateTime.DaysInMonth(now.Year, now.Month);
+		int startOffset = (int)first.DayOfWeek;
+
+		// Grille calendrier
+		GameObject gridGO = new GameObject("CalendarGrid");
+		gridGO.transform.SetParent(calendarPanel.transform, false);
+		var gridRt = gridGO.AddComponent<RectTransform>();
+		gridRt.anchorMin = new Vector2(0.5f, 0.5f);
+		gridRt.anchorMax = new Vector2(0.5f, 0.5f);
+		gridRt.sizeDelta = new Vector2(450, 240);
+		gridRt.anchoredPosition = new Vector2(0, 10);
+
+		int rows = 6, cols = 7;
+		float cellW = gridRt.sizeDelta.x / cols - 6;
+		float cellH = gridRt.sizeDelta.y / rows - 6;
+		dateCellToImage.Clear();
+
+		for (int i = 0; i < rows * cols; i++)
+		{
+			int row = i / cols;
+			int col = i % cols;
+			float x = (-gridRt.sizeDelta.x * 0.5f) + col * (cellW + 6) + cellW * 0.5f + 10;
+			float y = (gridRt.sizeDelta.y * 0.5f) - row * (cellH + 6) - cellH * 0.5f - 10;
+
+			GameObject cell = new GameObject("Cell_" + i);
+			cell.transform.SetParent(gridGO.transform, false);
+			var img = cell.AddComponent<Image>();
+			img.color = new Color(1,1,1,0.95f);
+			var rt = cell.GetComponent<RectTransform>();
+			rt.sizeDelta = new Vector2(cellW, cellH);
+			rt.anchoredPosition = new Vector2(x, y);
+			
+			// Add subtle border
+			var cellOutline = cell.AddComponent<Outline>();
+			cellOutline.effectColor = new Color(0.85f, 0.85f, 0.85f, 1f);
+			cellOutline.effectDistance = new Vector2(1, -1);
+
+			int dayNumber = i - startOffset + 1;
+			if (dayNumber >= 1 && dayNumber <= daysInMonth)
+			{
+				GameObject labelGO2 = new GameObject("Label");
+				labelGO2.transform.SetParent(cell.transform, false);
+				var label2 = labelGO2.AddComponent<Text>();
+				label2.text = dayNumber.ToString();
+				label2.font = GetUIFont();
+				label2.fontSize = 14;
+				label2.fontStyle = FontStyle.Bold;
+				label2.alignment = TextAnchor.MiddleCenter;
+				label2.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+				var lrt = labelGO2.GetComponent<RectTransform>();
+				lrt.anchorMin = Vector2.zero;
+				lrt.anchorMax = Vector2.one;
+				lrt.offsetMin = Vector2.zero;
+				lrt.offsetMax = Vector2.zero;
+
+				var cellBtn = cell.AddComponent<Button>();
+				DateTime date = new DateTime(now.Year, now.Month, dayNumber);
+				cellBtn.onClick.AddListener(() => OnCalendarDateClicked(date));
+				
+				// Modern button colors
+				var cellColors = cellBtn.colors;
+				cellColors.normalColor = Color.white;
+				cellColors.highlightedColor = new Color(0.85f, 0.9f, 1f, 1f);
+				cellColors.pressedColor = new Color(0.7f, 0.85f, 1f, 1f);
+				cellBtn.colors = cellColors;
+				
+				dateCellToImage[date] = img;
+			}
+			else
+			{
+				img.color = new Color(0.95f,0.95f,0.95f,0.3f);
+				cellOutline.enabled = false;
+			}
+		}
+		
+		// Rafraîchir la sélection de dates
+		UpdateCalendarVisuals();
+	}
+
+	private void OnCalendarDateClicked(DateTime date)
 		{
 			if (startDate == null || (endDate != null && date < startDate))
 			{
@@ -764,6 +937,26 @@ namespace Mode3D.Destinations
 				Destroy(proposalGO);
 			}
 		);
+	}
+
+	private void ShowMyOrders()
+	{
+		// Cacher le canvas d'accueil
+		if (selectorCanvas != null)
+		{
+			selectorCanvas.gameObject.SetActive(false);
+		}
+		
+		// Créer l'écran "Mes commandes"
+		GameObject ordersGO = new GameObject("MyOrdersUI");
+		MyOrdersUI ordersUI = ordersGO.AddComponent<MyOrdersUI>();
+		ordersUI.Show(() => {
+			// Callback quand on ferme "Mes commandes" - réafficher l'accueil
+			if (selectorCanvas != null)
+			{
+				selectorCanvas.gameObject.SetActive(true);
+			}
+		});
 	}
 
 		private Vector3 ComputeQuadScaleForCamera(Camera cam, Texture2D texture)

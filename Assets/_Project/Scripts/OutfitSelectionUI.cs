@@ -58,17 +58,20 @@ namespace Mode3D.Destinations
 			canvasGO.AddComponent<GraphicRaycaster>();
 			canvas.sortingOrder = 1000;
 
-			// Panel principal moderne arrondi GRAND et AÉRÉ
-			outfitPanel = UIHelper.CreateRoundedPanel(
-				canvasGO,
-				new Vector2(650, 550), // Plus grand et aéré
-				Vector2.zero,
-				new Color(0.03f, 0.03f, 0.03f, 0.95f),
-				25f // Grandes marges
-			);
+		// Panel principal moderne arrondi GRAND et AÉRÉ
+		outfitPanel = UIHelper.CreateRoundedPanel(
+			canvasGO,
+			new Vector2(650, 550), // Plus grand et aéré
+			Vector2.zero,
+			new Color(0.03f, 0.03f, 0.03f, 0.95f),
+			25f // Grandes marges
+		);
 
-			// Bouton retour (flèche)
-			CreateBackButton(outfitPanel);
+		// Bouton retour (flèche) au-dessus à gauche du panel
+		UIHelper.CreateBackButton(canvasGO, new Vector2(-240, 305),
+			() => { 
+				if (onBack != null) { Destroy(canvas.gameObject); onBack(); } 
+			});
 		}
 
 		private void UpdateDayUI()
@@ -278,13 +281,6 @@ namespace Mode3D.Destinations
 				() => NextDay());
 		}
 
-		private void CreateBackButton(GameObject parent)
-		{
-			UIHelper.CreateBackButton(parent, new Vector2(-265, 255),
-				() => { 
-					if (onBack != null) { Destroy(canvas.gameObject); onBack(); } 
-				});
-		}
 
 		private GameObject CreateButton(GameObject parent, string text, Vector2 pos, Vector2 size, Action onClick)
 		{

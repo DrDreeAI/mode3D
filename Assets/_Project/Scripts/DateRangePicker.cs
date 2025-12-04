@@ -12,6 +12,9 @@ namespace Mode3D.UI
 
         [Header("Controls")] 
         [SerializeField] private Button validateButton;
+        [SerializeField] private Button previousMonthButton;
+        [SerializeField] private Button nextMonthButton;
+        [SerializeField] private Text monthYearLabel;
 
         [Header("Styles")] 
         [SerializeField] private Color defaultColor = new Color(0.92f, 0.92f, 0.92f);
@@ -25,6 +28,7 @@ namespace Mode3D.UI
         private readonly List<DayCell> dayCells = new List<DayCell>();
         private DateTime? startSelection;
         private DateTime? endSelection;
+        private DateTime currentDisplayMonth;
 
         private const int DaysInWeek = 7;
 
@@ -40,14 +44,41 @@ namespace Mode3D.UI
                 var vb = transform.Find("ValidateDateButton");
                 if (vb != null) validateButton = vb.GetComponent<Button>();
             }
+            if (previousMonthButton == null)
+            {
+                var pb = transform.Find("PreviousMonthButton");
+                if (pb != null) previousMonthButton = pb.GetComponent<Button>();
+            }
+            if (nextMonthButton == null)
+            {
+                var nb = transform.Find("NextMonthButton");
+                if (nb != null) nextMonthButton = nb.GetComponent<Button>();
+            }
+            if (monthYearLabel == null)
+            {
+                var ml = transform.Find("MonthYearLabel");
+                if (ml != null) monthYearLabel = ml.GetComponent<Text>();
+            }
 
             if (validateButton != null)
             {
                 validateButton.onClick.RemoveAllListeners();
                 validateButton.onClick.AddListener(ValidateRange);
             }
+            if (previousMonthButton != null)
+            {
+                previousMonthButton.onClick.RemoveAllListeners();
+                previousMonthButton.onClick.AddListener(GoToPreviousMonth);
+            }
+            if (nextMonthButton != null)
+            {
+                nextMonthButton.onClick.RemoveAllListeners();
+                nextMonthButton.onClick.AddListener(GoToNextMonth);
+            }
 
-            BuildCalendar(DateTime.Today);
+            currentDisplayMonth = DateTime.Today;
+            BuildCalendar(currentDisplayMonth);
+            UpdateMonthYearLabel();
         }
 
         private void BuildCalendar(DateTime referenceDate)
@@ -174,6 +205,30 @@ namespace Mode3D.UI
             }
 
             OnRangeValidated?.Invoke(startSelection.Value, endSelection.Value);
+        }
+
+        private void GoToPreviousMonth()
+        {
+            currentDisplayMonth = currentDisplayMonth.AddMonths(-1);
+            BuildCalendar(currentDisplayMonth);
+            UpdateMonthYearLabel();
+            RefreshVisuals();
+        }
+
+        private void GoToNextMonth()
+        {
+            currentDisplayMonth = currentDisplayMonth.AddMonths(1);
+            BuildCalendar(currentDisplayMonth);
+            UpdateMonthYearLabel();
+            RefreshVisuals();
+        }
+
+        private void UpdateMonthYearLabel()
+        {
+            if (monthYearLabel != null)
+            {
+                monthYearLabel.text = currentDisplayMonth.ToString("MMMM yyyy");
+            }
         }
 
         private struct DayCell
