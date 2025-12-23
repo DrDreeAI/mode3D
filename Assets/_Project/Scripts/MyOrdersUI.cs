@@ -165,75 +165,75 @@ namespace Mode3D.Destinations
 		colors.pressedColor = new Color(0.15f, 0.4f, 0.7f, 0.9f);
 		btn.colors = colors;
 
-		// Numéro de commande
-		GameObject numGO = new GameObject("OrderNumber");
-		numGO.transform.SetParent(itemGO.transform, false);
-		Text numText = numGO.AddComponent<Text>();
-		numText.text = order.orderNumber;
-		numText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-		numText.fontSize = 14;
-		numText.fontStyle = FontStyle.Bold;
-		numText.color = new Color(0.3f, 0.8f, 1f, 1f);
-		numText.alignment = TextAnchor.MiddleLeft;
-		
-		RectTransform numRt = numGO.GetComponent<RectTransform>();
-		numRt.anchorMin = new Vector2(0f, 1f);
-		numRt.anchorMax = new Vector2(0f, 1f);
-		numRt.pivot = new Vector2(0f, 1f);
-		numRt.sizeDelta = new Vector2(200, 25);
-		numRt.anchoredPosition = new Vector2(15, -8);
-
-		// Nom du client
+		// Nom du client (à gauche, en haut)
 		GameObject nameGO = new GameObject("CustomerName");
 		nameGO.transform.SetParent(itemGO.transform, false);
 		Text nameText = nameGO.AddComponent<Text>();
 		nameText.text = $"👤 {order.customerName}";
 		nameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-		nameText.fontSize = 13;
+		nameText.fontSize = 14;
+		nameText.fontStyle = FontStyle.Bold;
 		nameText.color = Color.white;
 		nameText.alignment = TextAnchor.MiddleLeft;
-		
+
 		RectTransform nameRt = nameGO.GetComponent<RectTransform>();
 		nameRt.anchorMin = new Vector2(0f, 1f);
 		nameRt.anchorMax = new Vector2(0f, 1f);
 		nameRt.pivot = new Vector2(0f, 1f);
-		nameRt.sizeDelta = new Vector2(280, 20);
-		nameRt.anchoredPosition = new Vector2(15, -33);
+		nameRt.sizeDelta = new Vector2(250, 25);
+		nameRt.anchoredPosition = new Vector2(15, -8);
 
-		// Date et destination (ligne du bas)
-		GameObject infoGO = new GameObject("OrderInfo");
-		infoGO.transform.SetParent(itemGO.transform, false);
-		Text infoText = infoGO.AddComponent<Text>();
-		infoText.text = $"📅 {order.orderDate} | 🏙️ {order.destination}";
-		infoText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-		infoText.fontSize = 11;
-		infoText.color = new Color(0.7f, 0.7f, 0.7f, 1f);
-		infoText.alignment = TextAnchor.MiddleLeft;
-		
-		RectTransform infoRt = infoGO.GetComponent<RectTransform>();
-		infoRt.anchorMin = new Vector2(0f, 0f);
-		infoRt.anchorMax = new Vector2(0f, 0f);
-		infoRt.pivot = new Vector2(0f, 0f);
-		infoRt.sizeDelta = new Vector2(350, 18);
-		infoRt.anchoredPosition = new Vector2(15, 8);
-		
-		// Prix à droite
-		GameObject priceGO = new GameObject("TotalPrice");
-		priceGO.transform.SetParent(itemGO.transform, false);
-		Text priceText = priceGO.AddComponent<Text>();
-		priceText.text = $"{order.totalPrice:F2} €";
-		priceText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-		priceText.fontSize = 16;
-		priceText.fontStyle = FontStyle.Bold;
-		priceText.color = new Color(0.6f, 1f, 0.6f, 1f);
-		priceText.alignment = TextAnchor.MiddleRight;
-		
-		RectTransform priceRt = priceGO.GetComponent<RectTransform>();
-		priceRt.anchorMin = new Vector2(1f, 0.5f);
-		priceRt.anchorMax = new Vector2(1f, 0.5f);
-		priceRt.pivot = new Vector2(1f, 0.5f);
-		priceRt.sizeDelta = new Vector2(120, 60);
-		priceRt.anchoredPosition = new Vector2(-15, 0);
+		// Destination (à gauche, en bas)
+		GameObject destGO = new GameObject("Destination");
+		destGO.transform.SetParent(itemGO.transform, false);
+		Text destText = destGO.AddComponent<Text>();
+		destText.text = $"🏙️ {order.destination}";
+		destText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+		destText.fontSize = 12;
+		destText.color = new Color(0.7f, 0.7f, 0.7f, 1f);
+		destText.alignment = TextAnchor.MiddleLeft;
+
+		RectTransform destRt = destGO.GetComponent<RectTransform>();
+		destRt.anchorMin = new Vector2(0f, 0f);
+		destRt.anchorMax = new Vector2(0f, 0f);
+		destRt.pivot = new Vector2(0f, 0f);
+		destRt.sizeDelta = new Vector2(250, 20);
+		destRt.anchoredPosition = new Vector2(15, 8);
+
+		// Numéro de commande (à droite, en haut)
+		GameObject numGO = new GameObject("OrderNumber");
+		numGO.transform.SetParent(itemGO.transform, false);
+		Text numText = numGO.AddComponent<Text>();
+		numText.text = order.orderNumber;
+		numText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+		numText.fontSize = 12;
+		numText.fontStyle = FontStyle.Bold;
+		numText.color = new Color(0.3f, 0.8f, 1f, 1f);
+		numText.alignment = TextAnchor.MiddleRight;
+
+		RectTransform numRt = numGO.GetComponent<RectTransform>();
+		numRt.anchorMin = new Vector2(1f, 1f);
+		numRt.anchorMax = new Vector2(1f, 1f);
+		numRt.pivot = new Vector2(1f, 1f);
+		numRt.sizeDelta = new Vector2(230, 22);
+		numRt.anchoredPosition = new Vector2(-15, -8);
+
+		// Date et heure (à droite, en bas)
+		GameObject dateGO = new GameObject("OrderDate");
+		dateGO.transform.SetParent(itemGO.transform, false);
+		Text dateText = dateGO.AddComponent<Text>();
+		dateText.text = $"📅 {order.orderDate}";
+		dateText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+		dateText.fontSize = 11;
+		dateText.color = new Color(0.7f, 0.7f, 0.7f, 1f);
+		dateText.alignment = TextAnchor.MiddleRight;
+
+		RectTransform dateRt = dateGO.GetComponent<RectTransform>();
+		dateRt.anchorMin = new Vector2(1f, 0f);
+		dateRt.anchorMax = new Vector2(1f, 0f);
+		dateRt.pivot = new Vector2(1f, 0f);
+		dateRt.sizeDelta = new Vector2(230, 18);
+		dateRt.anchoredPosition = new Vector2(-15, 8);
 	}
 
 	private void ShowOrderDetails(OrderManager.OrderData order)

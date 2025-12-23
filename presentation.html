@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Présentation Mode3D</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --accent-color: #d4af37;
+            /* Gold */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .slides-container {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+        }
+
+        .slide {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 4rem;
+            overflow: hidden;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom right, #000000, #1a1a1a);
+            z-index: -1;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 6rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: var(--accent-color);
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 2rem;
+        }
+
+        h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        strong {
+            color: var(--accent-color);
+        }
+
+        p,
+        li {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #e0e0e0;
+            max-width: 900px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        blockquote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            border-left: none;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1200px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .img-container img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            filter: grayscale(20%);
+            transition: filter 0.3s;
+        }
+
+        .img-container img:hover {
+            filter: grayscale(0%);
+        }
+
+        .keywords {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .keyword {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--accent-color);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            color: var(--accent-color);
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: #333;
+            border-radius: 50%;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: var(--accent-color);
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav-dots">
+        <a href="#slide1" class="dot active" onclick="setActive(this)"></a>
+        <a href="#slide2" class="dot" onclick="setActive(this)"></a>
+        <a href="#slide3" class="dot" onclick="setActive(this)"></a>
+        <a href="#slide4" class="dot" onclick="setActive(this)"></a>
+        <a href="#slide5" class="dot" onclick="setActive(this)"></a>
+        <a href="#slide6" class="dot" onclick="setActive(this)"></a>
+        <a href="#slide7" class="dot" onclick="setActive(this)"></a>
+        <a href="#slide8" class="dot" onclick="setActive(this)"></a>
+        <a href="#slide9" class="dot" onclick="setActive(this)"></a>
+    </div>
+
+    <div class="slides-container">
+
+        <!-- SLIDE 1: Title -->
+        <section id="slide1" class="slide">
+            <h1>MODE 3D</h1>
+            <h3 style="font-family: 'Lato'; text-transform: uppercase; letter-spacing: 5px; font-size: 1.5rem;">L'Art de
+                Voyager avec Style</h3>
+            <div style="margin-top: 3rem; text-align: center;">
+                <p><strong>Équipe DrDreeAI</strong></p>
+                <p style="font-size: 1rem; opacity: 0.7;">Projet Unity VR 2025</p>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Problématique -->
+        <section id="slide2" class="slide">
+            <h2>Problématique</h2>
+            <div class="grid-2">
+                <div>
+                    <h3 style="color: #fff; margin-bottom: 2rem;">Le Dilemme du Voyageur Moderne</h3>
+                    <ul>
+                        <li>
+                            <strong>Incertitude Visuelle</strong><br>
+                            Impossible de visualiser les tenues portées sans les essayer physiquement.
+                        </li>
+                        <li>
+                            <strong>Gestion Climatique</strong><br>
+                            Difficulté d'adapter sa garde-robe à la météo imprévisible (Londres, Dubaï...).
+                        </li>
+                        <li>
+                            <strong>Stress de la Valise</strong><br>
+                            La peur d'oublier quelque chose ou de prendre trop.
+                        </li>
+                    </ul>
+                </div>
+                <div class="img-container">
+                    <img src="https://images.unsplash.com/photo-1565538810643-b5bdb714032a?auto=format&fit=crop&q=80&w=800"
+                        alt="Valise">
+                </div>
+            </div>
+            <blockquote>"Comment transformer la corvée de la valise en une expérience créative ?"</blockquote>
+        </section>
+
+        <!-- SLIDE 3: Business Analyse -->
+        <section id="slide3" class="slide">
+            <h2>Business Analyse : Chiffres Clés</h2>
+            <div class="grid-2">
+                <div>
+                    <ul style="border-left: none;">
+                        <li style="border-left: none; padding-left: 0; font-size: 1.5rem; margin-bottom: 2rem;">
+                            <strong>15.4 Milliards $</strong> : Marché de l'essayage virtuel estimé d'ici 2028
+                            (Croissance +19%/an).
+                        </li>
+                        <li style="border-left: none; padding-left: 0; font-size: 1.5rem; margin-bottom: 2rem;">
+                            <strong>30%</strong> : Taux moyen de retour dans l'e-commerce mode (que la VR aide à
+                            réduire).
+                        </li>
+                        <li style="border-left: none; padding-left: 0; font-size: 1.5rem; margin-bottom: 2rem;">
+                            <strong>60%</strong> : De la Gen Z intéressée par le shopping dans le métavers.
+                        </li>
+                    </ul>
+                    <p style="margin-top: 2rem;">Mots-clés recherchés :</p>
+                    <div class="keywords">
+                        <span class="keyword">Virtual Try-On</span>
+                        <span class="keyword">Metaverse Retail</span>
+                        <span class="keyword">Sustainable Fashion</span>
+                        <span class="keyword">Immersive CX</span>
+                    </div>
+                </div>
+                <div class="img-container">
+                    <img src="https://images.unsplash.com/photo-1535451801241-b5395e1d4a1b?auto=format&fit=crop&q=80&w=800"
+                        alt="VR Fashion">
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Solution -->
+        <section id="slide4" class="slide">
+            <h2>La Solution : Mode3D</h2>
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <p style="font-size: 1.8rem;">Une application <strong>VR tout-en-un</strong> qui agit comme un Personal
+                    Shopper.</p>
+            </div>
+            <div class="grid-2" style="gap: 2rem;">
+                <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 10px;">
+                    <h3>Intelligent</h3>
+                    <p>Suggère des tenues basées sur la météo et la durée.</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 10px;">
+                    <h3>Immersif</h3>
+                    <p>Visualisation 3D temps réel des vêtements portés.</p>
+                </div>
+                <div
+                    style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 10px; grid-column: span 2; text-align: center;">
+                    <h3>Pratique</h3>
+                    <p>Gestion budgétaire de la valise intégrée.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Fonctionnalités -->
+        <section id="slide5" class="slide">
+            <h2>Fonctionnalités Clés</h2>
+            <div class="grid-2">
+                <div class="img-container">
+                    <img src="https://images.unsplash.com/photo-1593508512255-86ab42a8e620?auto=format&fit=crop&q=80&w=800"
+                        alt="Features">
+                </div>
+                <div>
+                    <ul>
+                        <li>
+                            <strong>1. Planification 📅</strong><br>
+                            Sélection ville & dates avec adaptation à l'ambiance locale.
+                        </li>
+                        <li>
+                            <strong>2. Styling 👔</strong><br>
+                            Catégories (Chill, Sport, Business) et création de looks jour par jour.
+                        </li>
+                        <li>
+                            <strong>3. Défilé VR 🕶️</strong><br>
+                            Mannequins 3D rotatifs, changement de couleurs, validation visuelle.
+                        </li>
+                        <li>
+                            <strong>4. Commerce 💳</strong><br>
+                            Calcul du coût total et paiement simulé.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Demo -->
+        <section id="slide6" class="slide">
+            <h1 style="font-size: 5rem; letter-spacing: 10px;">DÉMONSTRATION</h1>
+            <p style="font-style: italic; opacity: 0.7; margin-top: 2rem;">(Lancement de l'environnement Unity...)</p>
+        </section>
+
+        <!-- SLIDE 7: Difficultés -->
+        <section id="slide7" class="slide">
+            <h2>Difficultés Rencontrées</h2>
+            <div class="grid-2">
+                <div>
+                    <ul>
+                        <li>
+                            <strong>Exportation MetaQuest ⚙️</strong><br>
+                            Frustration sur la pipeline de build Android/Oculus et la gestion des shaders mobile.
+                        </li>
+                        <li>
+                            <strong>Collaboration Mono-Device 💻</strong><br>
+                            Difficile de travailler à plusieurs sur un seul projet Unity (fichiers binaires).
+                        </li>
+                        <li>
+                            <strong>Courbe d'Apprentissage 📈</strong><br>
+                            Maîtriser le C# et l'architecture component-based de Unity en peu de temps.
+                        </li>
+                    </ul>
+                </div>
+                <div class="img-container">
+                    <img src="https://images.unsplash.com/photo-1555099962-4199c345e5dd?auto=format&fit=crop&q=80&w=800"
+                        alt="Coding">
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Avenir -->
+        <section id="slide8" class="slide">
+            <h2>Avenir du Projet</h2>
+            <div class="grid-2" style="align-items: start;">
+                <div>
+                    <h3 style="color: var(--accent-color);">Court Terme</h3>
+                    <ul>
+                        <li>Exportation sur le store <strong>MetaQuest</strong> autonome.</li>
+                        <li>Acquisition d'une bibliothèque massive de modèles 3D (.fbx).</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: var(--accent-color);">Moyen Terme</h3>
+                    <ul>
+                        <li><strong>Partenariats B2B</strong> : Digitalisation des stocks de pressings et dressings
+                            locaux.</li>
+                        <li><strong>App Mobile</strong> : Gérer sa garde-robe virtuelle à distance.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: Merci -->
+        <section id="slide9" class="slide">
+            <h1 style="font-size: 5rem;">MERCI</h1>
+            <p style="font-size: 2rem; margin: 2rem 0;"><strong>Avez-vous des questions ?</strong></p>
+            <p><em>DrDreeAI Team</em></p>
+        </section>
+
+    </div>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    document.querySelectorAll('.dot').forEach(dot => {
+                        dot.classList.remove('active');
+                        if (dot.getAttribute('href') === '#' + id) {
+                            dot.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.slide').forEach(slide => {
+            observer.observe(slide);
+        });
+
+        function setActive(element) {
+            document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

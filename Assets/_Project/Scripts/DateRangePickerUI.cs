@@ -39,6 +39,8 @@ public class DateRangePickerUI : MonoBehaviour
     public Color disabledColor = new Color(0.8f, 0.8f, 0.8f);
     public Color selectedColor = new Color(0.2f, 0.6f, 1f);
     public Color inRangeColor = new Color(0.7f, 0.9f, 1f);
+    public Color todayColor = new Color(0.3f, 0.7f, 1f); // Bleu pour aujourd'hui (jour J)
+    public Color pastDayColor = new Color(0.25f, 0.25f, 0.25f); // Gris sombre pour jours passés
 
     // internal state
     private DateTime visibleMonth;
@@ -164,17 +166,37 @@ public class DateRangePickerUI : MonoBehaviour
     private void UpdateButtonVisual(Button btn, DateTime dt)
     {
         var img = btn.GetComponent<Image>();
-        if (selectedStart.HasValue && selectedStart.Value.Date == dt.Date || selectedEnd.HasValue && selectedEnd.Value.Date == dt.Date)
+        DateTime today = DateTime.Today;
+
+        // Jours passés (gris sombre) - PRIORITÉ 1
+        if (dt.Date < today)
+        {
+            if (img != null) img.color = pastDayColor;
+            btn.interactable = false;
+        }
+        // Jour d'aujourd'hui (bleu) - PRIORITÉ 2
+        else if (dt.Date == today)
+        {
+            if (img != null) img.color = todayColor;
+            btn.interactable = true;
+        }
+        // Jour sélectionné - PRIORITÉ 3
+        else if (selectedStart.HasValue && selectedStart.Value.Date == dt.Date || selectedEnd.HasValue && selectedEnd.Value.Date == dt.Date)
         {
             if (img != null) img.color = selectedColor;
+            btn.interactable = true;
         }
+        // Dans la plage sélectionnée - PRIORITÉ 4
         else if (selectedStart.HasValue && selectedEnd.HasValue && dt.Date > selectedStart.Value.Date && dt.Date < selectedEnd.Value.Date)
         {
             if (img != null) img.color = inRangeColor;
+            btn.interactable = true;
         }
+        // Jours futurs (blanc normal) - PRIORITÉ 5
         else
         {
             if (img != null) img.color = normalColor;
+            btn.interactable = true;
         }
     }
 
